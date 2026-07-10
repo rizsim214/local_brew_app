@@ -9,7 +9,7 @@ type AdminDashboardProps = {
   metrics: AdminMetrics;
 };
 
-export function AdminDashboard({ metrics }: AdminDashboardProps) {
+export function AdminDashboard({ metrics }: Readonly<AdminDashboardProps>) {
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-8 px-6 py-10">
       <div className="flex flex-col gap-3 rounded-[2rem] border border-border bg-card p-8 shadow-sm sm:flex-row sm:items-end sm:justify-between">

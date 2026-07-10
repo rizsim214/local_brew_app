@@ -4,7 +4,7 @@ import { useState } from "react";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
 
 import { AdminDashboard } from "@/src/components/admin/admin-dashboard";
-import { getAdminMetrics } from "@/src/app/admin/analytics";
+import { authenticateAdmin, getAdminMetrics } from "@/src/app/admin/analytics";
 
 export default function AdminDashboardPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -21,7 +21,8 @@ export default function AdminDashboardPage() {
       return;
     }
 
-    if (username !== process.env.ADMIN_USERNAME || password !== process.env.ADMIN_PASSWORD) {
+    const isValidAdmin = await authenticateAdmin(username, password);
+    if (!isValidAdmin) {
       setError("Invalid credentials.");
       return;
     }
@@ -70,7 +71,7 @@ export default function AdminDashboardPage() {
                   value={username}
                   onChange={(event) => setUsername(event.target.value)}
                   className="w-full rounded-2xl border border-border bg-background px-3 py-2 text-sm outline-none ring-offset-background focus:border-primary focus:ring-2 focus:ring-ring"
-                  placeholder="admin"
+                  placeholder="username"
                 />
               </div>
 
@@ -84,7 +85,7 @@ export default function AdminDashboardPage() {
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   className="w-full rounded-2xl border border-border bg-background px-3 py-2 text-sm outline-none ring-offset-background focus:border-primary focus:ring-2 focus:ring-ring"
-                  placeholder="admin123"
+                  placeholder="password"
                 />
               </div>
 
@@ -103,7 +104,7 @@ export default function AdminDashboardPage() {
   return (
     <div className="flex flex-1 flex-col">
       <div className="flex justify-end px-6 pt-6">
-        <button type="button" onClick={handleLogout} className="rounded-full border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent">
+        <button type="button" onClick={handleLogout} className="rounded-full bg-white border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent">
           Log out
         </button>
       </div>
@@ -111,4 +112,3 @@ export default function AdminDashboardPage() {
     </div>
   );
 }
-

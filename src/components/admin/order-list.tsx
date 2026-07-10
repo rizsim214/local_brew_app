@@ -9,7 +9,7 @@ type OrderListProps = {
   orders: OrderWithRelations[];
 };
 
-export function OrderList({ orders }: OrderListProps) {
+export function OrderList({ orders }: Readonly<OrderListProps>) {
   return (
     <div className="rounded-[2rem] border border-border bg-card p-6 shadow-sm">
       <div className="flex items-center justify-between">
