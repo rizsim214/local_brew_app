@@ -12,13 +12,6 @@ export type AdminMetrics = {
   }>;
 };
 
-export async function authenticateAdmin(username: string, password: string): Promise<boolean> {
-  return (
-    username === process.env.ADMIN_USERNAME &&
-    password === process.env.ADMIN_PASSWORD
-  );
-}
-
 export async function getAdminMetrics(): Promise<AdminMetrics> {
   // Protect route logic inside production deployments here using NextAuth
 

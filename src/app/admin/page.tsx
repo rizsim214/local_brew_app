@@ -1,17 +1,23 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
 
 import { AdminDashboard } from "@/src/components/admin/admin-dashboard";
-import { authenticateAdmin, getAdminMetrics } from "@/src/app/admin/analytics";
+import {
+  getAdminOverview,
+  type AdminOverview,
+  type AdminProductRecord,
+} from "@/src/app/admin/actions";
 
 export default function AdminDashboardPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [credentials, setCredentials] = useState<{ username: string; password: string } | null>(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [metrics, setMetrics] = useState<Awaited<ReturnType<typeof getAdminMetrics>> | null>(null);
+  const [overview, setOverview] = useState<AdminOverview | null>(null);
 
   async function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -21,35 +27,47 @@ export default function AdminDashboardPage() {
       return;
     }
 
-    const isValidAdmin = await authenticateAdmin(username, password);
-    if (!isValidAdmin) {
-      setError("Invalid credentials.");
+    const result = await getAdminOverview({ username, password });
+    if (!result.success) {
+      setError(result.error);
       return;
     }
 
-    const adminMetrics = await getAdminMetrics();
-    setMetrics(adminMetrics);
+    setCredentials({ username, password });
+    setOverview(result.data);
     setIsLoggedIn(true);
     setError("");
   }
 
+  function handleProductCreated(product: AdminProductRecord) {
+    setOverview((current) =>
+      current
+        ? {
+            ...current,
+            products: [product, ...current.products],
+          }
+        : current,
+    );
+  }
+
   function handleLogout() {
     setIsLoggedIn(false);
-    setMetrics(null);
+    setOverview(null);
+    setCredentials(null);
     setUsername("");
     setPassword("");
     setError("");
   }
 
-  if (!isLoggedIn || !metrics) {
+  if (!isLoggedIn || !overview || !credentials) {
     return (
       <div className="flex flex-1 items-center justify-center bg-background p-6">
         <div className="w-full max-w-sm rounded-[2rem] border border-border bg-card p-6 shadow-sm">
           <div className="mb-6 flex flex-col gap-4">
-            <a href="/" className="inline-flex items-center text-sm font-medium text-primary transition-colors hover:text-primary/80">
+            <Link href="/" className="inline-flex items-center text-sm font-medium text-primary transition-colors hover:text-primary/80">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back home
-            </a>
+            </Link>
             <div className="text-center">
               <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 text-primary">
                 <ShieldCheck className="size-5" />
@@ -104,11 +122,16 @@ export default function AdminDashboardPage() {
   return (
     <div className="flex flex-1 flex-col">
       <div className="flex justify-end px-6 pt-6">
-        <button type="button" onClick={handleLogout} className="rounded-full bg-white border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent">
+        <button type="button" onClick={handleLogout} className="rounded-full border border-border bg-white px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent">
           Log out
         </button>
       </div>
-      <AdminDashboard metrics={metrics} />
+      <AdminDashboard
+        metrics={overview.metrics}
+        products={overview.products}
+        credentials={credentials}
+        onProductCreated={handleProductCreated}
+      />
     </div>
   );
 }

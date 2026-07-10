@@ -28,7 +28,12 @@ export function CheckoutClient() {
     try {
       const result = await createOrder({
         customerName,
-        items: items.map((item) => ({ id: item.id, quantity: item.quantity })),
+        items: items.map((item) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+          selectedSize: item.selectedSize,
+          selectedAddOns: item.addOns,
+        })),
       });
 
       if (!result.success) {
@@ -37,7 +42,7 @@ export function CheckoutClient() {
       }
 
       clearCart();
-      setMessage(`Order placed successfully. We’ll send you to Local Brew’s Facebook page to finish the conversation.`);
+      setMessage("Order placed successfully. We'll send you to Local Brew's Facebook page to finish the conversation.");
       window.location.assign(result.redirectUrl || "");
     } catch {
       setError("Unexpected error. Please try again.");
@@ -58,7 +63,7 @@ export function CheckoutClient() {
           <p className="text-sm font-medium uppercase tracking-[0.3em] text-primary">Checkout</p>
           <h1 className="text-3xl font-semibold text-foreground">Almost there.</h1>
           <p className="text-sm text-muted-foreground">
-            Share your name and we’ll turn your cart into a quick message for the Local Brew team.
+            Share your name and we&apos;ll turn your cart into a quick message for the Local Brew team.
           </p>
         </div>
 
@@ -109,8 +114,13 @@ export function CheckoutClient() {
                 <div>
                   <p className="font-medium text-foreground">{item.name}</p>
                   <p className="text-sm text-muted-foreground">Qty {item.quantity}</p>
+                  {item.addOns.length > 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                      {item.addOns.map((addOn) => addOn.name).join(", ")}
+                    </p>
+                  ) : null}
                 </div>
-                <p className="font-medium text-foreground">₱{(item.price * item.quantity).toFixed(2)}</p>
+                <p className="font-medium text-foreground">PHP {(item.price * item.quantity).toFixed(2)}</p>
               </div>
             ))
           )}
@@ -118,7 +128,7 @@ export function CheckoutClient() {
 
         <div className="mt-6 flex items-center justify-between border-t border-border pt-4 text-sm">
           <span className="text-muted-foreground">Subtotal</span>
-          <span className="font-semibold text-foreground">₱{subtotal.toFixed(2)}</span>
+          <span className="font-semibold text-foreground">PHP {subtotal.toFixed(2)}</span>
         </div>
       </aside>
     </div>
