@@ -1,1 +1,1 @@
-export const db = true;
+export { prisma } from "@/lib/prisma";

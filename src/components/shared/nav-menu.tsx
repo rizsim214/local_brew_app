@@ -17,7 +17,7 @@ export function NavMenu() {
       <div className="mx-auto flex max-w-6xl items-center px-6 py-4">
         <Link href="/" className="inline-flex items-center gap-x-2 text-lg font-semibold text-primary">
           <Coffee className=" h-8 w-8 md:h-10 md:w-10" />
-          <span className="tracking-wider mt-1.5 hidden md:block">LokalBrew</span>
+          <span className="tracking-wider mt-1.5 hidden md:block">LOKALBREW</span>
         </Link>
 
         <div className="flex flex-1 justify-center">

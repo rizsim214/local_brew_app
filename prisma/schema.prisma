@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ProductCategory {
+  HOT_ESPRESSO
+  COLD_ESPRESSO
+  PASTRY
+  SANDWICH
+}
+
+model Product {
+  id          String          @id @default(uuid())
+  name        String
+  description String
+  price       Decimal
+  imageUrl    String
+  imageUrls   Json
+  category    ProductCategory
+  sizeOptions Json?
+  addOnOptions Json?
+  isActive    Boolean         @default(true)
+  orderItems  OrderItem[]
+  createdAt   DateTime        @default(now())
+}
+
+model Order {
+  id          String      @id @default(uuid())
+  customerName String
+  status      String      @default("PENDING") // PENDING, COMPLETED, CANCELLED
+  totalAmount Decimal
+  createdAt   DateTime    @default(now())
+  items       OrderItem[]
+}
+
+model OrderItem {
+  id             String   @id @default(uuid())
+  orderId   String
+  productId String
+  quantity  Int
+  price     Decimal
+  selectedSize String?
+  selectedAddOns Json?
+  order          Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product        Product  @relation(fields: [productId], references: [id])
+}
