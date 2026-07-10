@@ -2,11 +2,16 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+import { type ProductAddOnOption } from "@/src/lib/product-catalog";
+
 export interface CartItem {
   id: string;
+  productId: string;
   name: string;
   price: number;
   quantity: number;
+  selectedSize?: string;
+  addOns: ProductAddOnOption[];
 }
 
 interface CartState {
@@ -30,7 +35,16 @@ export const useCart = create<CartState>()(
               ),
             };
           }
-          return { items: [...state.items, { ...newItem, quantity: 1 }] };
+          return {
+            items: [
+              ...state.items,
+              {
+                ...newItem,
+                addOns: newItem.addOns ?? [],
+                quantity: 1,
+              },
+            ],
+          };
         }),
       removeItem: (id) =>
         set((state) => ({

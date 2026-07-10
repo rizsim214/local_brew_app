@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
 import { prisma } from "@/src/lib/db";
+import { parseJsonArray, type ProductAddOnOption } from "@/src/lib/product-catalog";
 
 type Params = Promise<{ readonly id: string }>;
 
@@ -44,15 +45,27 @@ export default async function AdminOrderDetailPage({ params }: Readonly<{ params
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_0.45fr]">
           <div className="space-y-3">
-            {order.items.map((item) => (
-              <div key={item.id} className="flex items-center justify-between rounded-[1.2rem] border border-border bg-background/70 px-4 py-3">
-                <div>
-                  <p className="font-medium text-foreground">{item.product.name}</p>
-                  <p className="text-sm text-muted-foreground">Qty {item.quantity}</p>
+            {order.items.map((item) => {
+              const addOns = parseJsonArray<ProductAddOnOption>(item.selectedAddOns);
+
+              return (
+                <div key={item.id} className="flex items-center justify-between rounded-[1.2rem] border border-border bg-background/70 px-4 py-3">
+                  <div>
+                    <p className="font-medium text-foreground">{item.product.name}</p>
+                    <p className="text-sm text-muted-foreground">Qty {item.quantity}</p>
+                    {item.selectedSize ? (
+                      <p className="text-sm text-muted-foreground">Size: {item.selectedSize}</p>
+                    ) : null}
+                    {addOns.length > 0 ? (
+                      <p className="text-sm text-muted-foreground">
+                        Add-ons: {addOns.map((addOn) => addOn.name).join(", ")}
+                      </p>
+                    ) : null}
+                  </div>
+                  <p className="font-medium text-foreground">PHP {(Number(item.price) * item.quantity).toFixed(2)}</p>
                 </div>
-                <p className="font-medium text-foreground">₱{(Number(item.price) * item.quantity).toFixed(2)}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="rounded-[1.5rem] border border-border bg-background/70 p-5">
@@ -68,7 +81,7 @@ export default async function AdminOrderDetailPage({ params }: Readonly<{ params
               </div>
               <div className="flex items-center justify-between">
                 <span>Total</span>
-                <span className="font-medium text-foreground">₱{Number(order.totalAmount).toFixed(2)}</span>
+                <span className="font-medium text-foreground">PHP {Number(order.totalAmount).toFixed(2)}</span>
               </div>
             </div>
           </div>

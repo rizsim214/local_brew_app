@@ -4,12 +4,25 @@ import Link from "next/link";
 import { ArrowUpRight, ReceiptText, TrendingUp } from "lucide-react";
 
 import { type AdminMetrics } from "@/src/app/admin/analytics";
+import { AdminProductManager } from "@/src/components/admin/admin-product-manager";
+import { type AdminProductRecord } from "@/src/app/admin/actions";
 
 type AdminDashboardProps = {
   metrics: AdminMetrics;
+  products: AdminProductRecord[];
+  credentials: {
+    username: string;
+    password: string;
+  };
+  onProductCreated: (product: AdminProductRecord) => void;
 };
 
-export function AdminDashboard({ metrics }: Readonly<AdminDashboardProps>) {
+export function AdminDashboard({
+  metrics,
+  products,
+  credentials,
+  onProductCreated,
+}: Readonly<AdminDashboardProps>) {
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-8 px-6 py-10">
       <div className="flex flex-col gap-3 rounded-[2rem] border border-border bg-card p-8 shadow-sm sm:flex-row sm:items-end sm:justify-between">
@@ -53,6 +66,12 @@ export function AdminDashboard({ metrics }: Readonly<AdminDashboardProps>) {
           </div>
         </div>
       </div>
+
+      <AdminProductManager
+        credentials={credentials}
+        products={products}
+        onProductCreated={onProductCreated}
+      />
     </div>
   );
 }
