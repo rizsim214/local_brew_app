@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { type Order, type Product, type OrderItem } from "@prisma/client";
 
+import { parseJsonArray, type ProductAddOnOption } from "@/src/lib/product-catalog";
+
 type OrderWithRelations = Order & {
   items: Array<OrderItem & { product: Product }>;
 };
@@ -34,9 +36,22 @@ export function OrderList({ orders }: Readonly<OrderListProps>) {
               <div>
                 <p className="font-medium text-foreground">{order.customerName}</p>
                 <p className="text-sm text-muted-foreground">{order.items.length} item(s)</p>
+                <p className="text-sm text-muted-foreground">
+                  {order.items
+                    .map((item) => {
+                      const addOns = parseJsonArray<ProductAddOnOption>(item.selectedAddOns);
+                      const addOnSummary =
+                        addOns.length > 0
+                          ? ` + ${addOns.map((addOn) => addOn.name).join(", ")}`
+                          : "";
+                      const sizeSummary = item.selectedSize ? ` (${item.selectedSize})` : "";
+                      return `${item.product.name}${sizeSummary}${addOnSummary}`;
+                    })
+                    .join(" | ")}
+                </p>
               </div>
               <div className="text-sm text-muted-foreground">
-                <p>₱{Number(order.totalAmount).toFixed(2)}</p>
+                <p>PHP {Number(order.totalAmount).toFixed(2)}</p>
                 <p className="font-medium text-foreground">{order.status}</p>
               </div>
             </Link>
